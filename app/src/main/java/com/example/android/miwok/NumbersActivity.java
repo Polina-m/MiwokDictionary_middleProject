@@ -24,22 +24,24 @@ public class NumbersActivity extends AppCompatActivity {
             releaseMediaPlayer();
         }
     };
-    private AudioManager mAudioManager;
 
-    AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
-        @Override
-        public void onAudioFocusChange(int focusChange) {
-            if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
-                    focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                mMediaPlayer.pause();
-                mMediaPlayer.seekTo(0);
-            } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                mMediaPlayer.start();
-            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                releaseMediaPlayer();
-            }
-        }
-    };
+    private AudioManager mAudioManager;
+    AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
+            new AudioManager.OnAudioFocusChangeListener() {
+                @Override
+                public void onAudioFocusChange(int focusChange) {
+                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
+                            focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+                        if (mMediaPlayer != null) {
+                            mMediaPlayer.pause();
+                            mMediaPlayer.seekTo(0);}
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                        mMediaPlayer.start();
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                        releaseMediaPlayer();
+                    }
+                }
+            };
 
     @Override
     protected void onStop() {
@@ -53,9 +55,12 @@ public class NumbersActivity extends AppCompatActivity {
         setContentView(R.layout.word_list);
 
         mAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+
         final int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener,
                 AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+
+
 
         final ArrayList<Word> words = new ArrayList<Word>();
         words.add(new Word("one", "lutti", R.drawable.number_one, R.raw.number_one));

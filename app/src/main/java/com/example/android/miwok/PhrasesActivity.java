@@ -19,29 +19,31 @@ public class PhrasesActivity extends AppCompatActivity {
      * Activity has the same logic as ColorsActivity, where there are comments
      */
     private MediaPlayer mMediaPlayer;
+    private AudioManager mAudioManager;
+
+    private AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
+                    focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+                if (mMediaPlayer != null) {
+                    mMediaPlayer.pause();
+                    mMediaPlayer.seekTo(0);}
+            } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                mMediaPlayer.start();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                releaseMediaPlayer();
+            }
+        }
+    };
+
+
     private MediaPlayer.OnCompletionListener mCompletionListener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mediaPlayer) {
             releaseMediaPlayer();
         }
     };
-
-    private AudioManager mAudioManager;
-
-    AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
-            new AudioManager.OnAudioFocusChangeListener() {
-                public void onAudioFocusChange(int focusChange) {
-                     if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
-                             focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                        mMediaPlayer.pause();
-                        mMediaPlayer.seekTo(0);
-                    } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                        mMediaPlayer.start();
-                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                         releaseMediaPlayer();
-                     }
-                }
-            };
 
     @Override
     protected void onStop() {
